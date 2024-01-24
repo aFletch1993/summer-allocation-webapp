@@ -1,0 +1,39 @@
+.completed-items-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Adjust the space between columns */
+}
+
+.completed-category {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.completed-item {
+    display: flex;
+    justify-content: space-between; /* Puts space between the item text and the delete button */
+    align-items: center;
+    margin-bottom: 10px; /* Space between items */
+    padding-right: 20px; /* Adjust as needed for uniform spacing */
+}
+
+.delete-button {
+    margin-left: auto; /* Pushes the button to the right */
+}
+
+.completed-item1 {
+    display: flex;
+    justify-content: space-between; /* Puts space between the item text and the delete button */
+    align-items: center;
+    width: 100%; /* Ensures each item stretches to fill the column width */
+    margin-bottom: 10px; /* Space between items */
+}
+
+.completed-item2 {
+    display: flex;
+    justify-content: space-between; /* Puts space between the item text and the delete button */
+    align-items: center;
+    width: 100%; /* Ensures each item stretches to fill the column width */
+    margin-bottom: 10px; /* Space between items */
+}

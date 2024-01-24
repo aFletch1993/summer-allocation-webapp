@@ -1,0 +1,20 @@
+.header {
+    background-color: #f3f4f6; /* Soft, muted background color */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+  }
+  
+  .header-title {
+    margin: 0;
+    color: #333; /* Dark color for the title */
+    font-family: 'Arial', sans-serif; /* Stylish, readable font */
+  }
+  
+  .header-nav .nav-link {
+    color: #333;
+    text-decoration: none;
+    margin-left: 20px;
+    font-family: 'Arial', sans-serif;
+  }
