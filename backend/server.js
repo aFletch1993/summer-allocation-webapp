@@ -1,8 +1,10 @@
 const express = require('express');
+const cors = require('cors');
 const { Pool } = require('pg');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
     const pool = new Pool({
         user: 'postgres',
@@ -36,14 +38,15 @@ app.use(express.json());
     app.get('/api/waitlist', async (req, res) => {
         try {
             const result = await pool.query('SELECT * FROM waitlist');
-            res.json('result.rows');
+            res.json(result.rows);
         } catch (err) {
             res.status(500).send('Server Error');
         }
     });
 
-    app.get('/api/waitlist', async (req, res) => {
+    app.get('/api/waitlist/:id', async (req, res) => {
         try {
+            const { id } = req.params; // Extract ID from parameters
             const result = await pool.query('SELECT * FROM waitlist WHERE id = $1', [id]);
             if (result.rows.length === 0) {
                 return res.status(404).send('Waitlist person not found');
@@ -57,7 +60,7 @@ app.use(express.json());
 
 
 
-    app.put('/api/waitlist', async (req, res) => {
+    app.put('/api/waitlist/:id', async (req, res) => {
         try {
             const { id } = req.params;
             const { description } = req.body;
@@ -73,8 +76,8 @@ app.use(express.json());
 
 
 
-    
-    app.delete('/api/waitlist', async (req, res) => {
+
+    app.delete('/api/waitlist/:id', async (req, res) => {
         try {
             const { id } = req.params;
             const result = await pool.query('DELETE FROM waitlist WHERE id = $1 RETURNING *', [id]);
