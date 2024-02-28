@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import ToDoItem from './ToDoItem';
 import CompletedItems from '../completedItems/CompletedItems';
+import { useAuth } from '../AuthContext/AuthContext'; // Adjust the import path as necessary
 import './ToDoList.css';
 
 function ToDoList() {
+    const { isAuthenticated, userToken } = useAuth(); // Use userToken for authenticated requests
     const [items, setItems] = useState([]);
     const [completedItems, setCompletedItems] = useState([]);
     const [newItem, setNewItem] = useState("");
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/waitlist')
-            .then(response => response.json())
-            .then(data => setItems(data))
-            .catch(error => console.error('Error fetching data:', error));
-    }, []);
+        // Conditional data fetching based on authentication
+        if (isAuthenticated) {
+            fetch('http://localhost:3001/api/waitlist', {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`, // Use the token for secure requests
+                },
+            })
+                .then(response => response.json())
+                .then(data => setItems(data))
+                .catch(error => console.error('Error fetching data:', error));
+        }
+    }, [isAuthenticated, userToken]); // React to changes in authentication state
 
     const handleAddItem = (event) => {
         event.preventDefault();
@@ -24,62 +33,80 @@ function ToDoList() {
             completed: false
         };
 
-        fetch('http://localhost:3001/api/waitlist', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newItemObject),
-        })
-        .then(response => response.json())
-        .then(data => {
-            setItems(prevItems => [...prevItems, data]);  // 'data' contains the new item with its ID
-            setNewItem("");
-        })
-        .catch(error => console.error('Error adding item:', error));
+        if (isAuthenticated) {
+            fetch('http://localhost:3001/api/waitlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`, // Secure the request with the token
+                },
+                body: JSON.stringify(newItemObject),
+            })
+            .then(response => response.json())
+            .then(data => {
+                setItems(prevItems => [...prevItems, data]);  // 'data' contains the new item with its ID
+                setNewItem("");
+            })
+            .catch(error => console.error('Error adding item:', error));
+        }
     };
 
     const onToggle = (itemId) => {
-        setItems(prevItems => {
-            const newItems = prevItems.filter(item => item.id !== itemId);
-            const completedItem = prevItems.find(item => item.id === itemId);
+        if (!isAuthenticated) return;
     
-            if (completedItem) {
-                setCompletedItems(prevCompleted => {
-                    if(!prevCompleted.some(item => item.id === completedItem.id)) {
-                        return [...prevCompleted, {...completedItem, completed: true}]
-                    }
-                    return prevCompleted;
-                })
-            }
-            return newItems;
-        });
-    };
-
-    const onUpdate = (itemId, updatedData) => {
+        const item = items.find(item => item.id === itemId);
+        if (!item) return;
+    
+        const updatedItem = { ...item, completed: !item.completed };
+    
         fetch(`http://localhost:3001/api/waitlist/${itemId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userToken}`,
+            },
+            body: JSON.stringify(updatedItem),
+        })
+        .then(response => response.json())
+        .then(data => {
+            setItems(prevItems => prevItems.map(item => item.id === itemId ? { ...item, completed: data.completed } : item));
+        })
+        .catch(error => console.error('Error updating item:', error));
+    };
+
+    const onUpdate = (itemId, updatedData) => {
+        if (!isAuthenticated) return;
+    
+        fetch(`http://localhost:3001/api/waitlist/${itemId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userToken}`,
             },
             body: JSON.stringify(updatedData),
         })
         .then(response => response.json())
         .then(data => {
-            setItems(prevItems => prevItems.map(item => item.id === itemId ? data : item));
+            setItems(prevItems => prevItems.map(item => item.id === itemId ? { ...item, ...data } : item));
         })
         .catch(error => console.error('Error updating item:', error));
     };
 
     const onDelete = (itemId) => {
+        if (!isAuthenticated) return;
+    
         fetch(`http://localhost:3001/api/waitlist/${itemId}`, {
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${userToken}`,
+            },
         })
         .then(response => {
             if (response.ok) {
-                setCompletedItems(prevItems => prevItems.filter(item => item.id !== itemId));
+                setItems(prevItems => prevItems.filter(item => item.id !== itemId));
+                setCompletedItems(prevCompleted => prevCompleted.filter(item => item.id !== itemId));
             } else {
-                throw new Error('Error deleting waitlist');
+                throw new Error('Error deleting item');
             }
         })
         .catch(error => console.error('Error:', error));

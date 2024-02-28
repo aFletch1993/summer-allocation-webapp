@@ -1,10 +1,14 @@
 import React from 'react';
+import { useAuth } from '../AuthContext/AuthContext';
 import './ToDoItem.css';
 
 function ToDoItem({ item, onToggle }) {
+    const { isAuthenticated } = useAuth();
 
     const handleChange = () => {
-        onToggle(item.id);
+        if (isAuthenticated) {
+            onToggle(item.id);
+        }
     };
 
     return (
@@ -13,7 +17,7 @@ function ToDoItem({ item, onToggle }) {
             <span className={item.completed ? 'completed' : ''}>{item.description}</span>
         </div>
 
-    )
+    );
 }
 
 export default ToDoItem;

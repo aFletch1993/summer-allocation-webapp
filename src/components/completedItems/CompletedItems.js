@@ -1,9 +1,25 @@
 import React from 'react';
+import { useAuth } from '../AuthContext/AuthContext';
 import './CompletedItems.css';
 
 function CompletedItems({ completedItems, onDelete }) {
+     const { isAuthenticated, user } = useAuth();
     const category1 = completedItems.filter((item, index) => index % 2 === 0);
     const category2 = completedItems.filter((item, index) => index % 2 !== 0);
+
+    const isSuperuser = user?.role === 'postgres';
+
+    const handleDelete = (itemId) => {
+        if(!isAuthenticated) {
+            alert('You lack the required permissions to do this. You should not be here.');
+            return;
+        }
+        if (!isSuperuser) {
+            alert('You lack the required permission for deletion.');
+            return;
+        }
+        onDelete(itemId);
+    }
 
     return (
         <div className="completed-items-container">
@@ -12,7 +28,9 @@ function CompletedItems({ completedItems, onDelete }) {
                 {category1.map(item => (
                     <div key={item.id} className="completed-item">
                         {item.description}
-                        <button className="delete-button" onClick={() => onDelete(item.id)}>Delete</button>
+                        {isAuthenticated && (
+                             <button className="delete-button" onClick={() => handleDelete(item.id)}>Delete</button>
+                        )}
                     </div>
                 ))}
             </div>
@@ -21,7 +39,9 @@ function CompletedItems({ completedItems, onDelete }) {
                 {category2.map(item => (
                     <div key={item.id} className="completed-item">
                         {item.description}
-                        <button className="delete-button" onClick={() => onDelete(item.id)}>Delete</button>
+                        {isAuthenticated && (
+                        <button className="delete-button" onClick={() => handleDelete(item.id)}>Delete</button>
+                        )}
                     </div>
                 ))}
             </div>
