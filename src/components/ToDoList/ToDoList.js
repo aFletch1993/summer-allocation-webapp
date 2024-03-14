@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ToDoItem from './ToDoItem';
 import CompletedItems from '../completedItems/CompletedItems';
 import { useAuth } from '../AuthContext/AuthContext'; // Adjust the import path as necessary
+
 import './ToDoList.css';
 
 function ToDoList() {
@@ -73,7 +74,7 @@ function ToDoList() {
         })
         .catch(error => console.error('Error updating item:', error));
     };
-
+/*
     const onUpdate = (itemId, updatedData) => {
         if (!isAuthenticated) return;
     
@@ -91,7 +92,7 @@ function ToDoList() {
         })
         .catch(error => console.error('Error updating item:', error));
     };
-
+*/
     const onDelete = (itemId) => {
         if (!isAuthenticated) return;
     
@@ -114,6 +115,16 @@ function ToDoList() {
 
     return (
         <div>
+            {!isAuthenticated ? (
+                <div>
+                    <Link to='/login'><button>Login</button></Link>
+                    <Link to='/register'><button>Register</button></Link>
+                </div>
+            ) : (
+                <div>
+                    <button onClick={logout}>Logout</button>
+                </div>
+            )}
             <div className="todo-list-container">
                 <form onSubmit={handleAddItem} className="todo-form">
                     <input
