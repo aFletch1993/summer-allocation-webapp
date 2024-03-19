@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import ToDoItem from './ToDoItem';
 import CompletedItems from '../completedItems/CompletedItems';
 import { useAuth } from '../AuthContext/AuthContext'; // Adjust the import path as necessary
+import { Link } from 'react-router-dom';
 
 import './ToDoList.css';
 
 function ToDoList() {
-    const { isAuthenticated, userToken } = useAuth(); // Use userToken for authenticated requests
+    const { isAuthenticated, userToken, login, logout } = useAuth(); // Use userToken for authenticated requests
     const [items, setItems] = useState([]);
     const [completedItems, setCompletedItems] = useState([]);
     const [newItem, setNewItem] = useState("");
@@ -14,7 +15,7 @@ function ToDoList() {
     useEffect(() => {
         // Conditional data fetching based on authentication
         if (isAuthenticated) {
-            fetch('http://localhost:3001/api/waitlist', {
+            fetch('http://localhost:3000/api/waitlist', {
                 headers: {
                     'Authorization': `Bearer ${userToken}`, // Use the token for secure requests
                 },
@@ -35,7 +36,7 @@ function ToDoList() {
         };
 
         if (isAuthenticated) {
-            fetch('http://localhost:3001/api/waitlist', {
+            fetch('http://localhost:3000/api/waitlist', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ function ToDoList() {
     
         const updatedItem = { ...item, completed: !item.completed };
     
-        fetch(`http://localhost:3001/api/waitlist/${itemId}`, {
+        fetch(`http://localhost:3000/api/waitlist/${itemId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ function ToDoList() {
     const onDelete = (itemId) => {
         if (!isAuthenticated) return;
     
-        fetch(`http://localhost:3001/api/waitlist/${itemId}`, {
+        fetch(`http://localhost:3000/api/waitlist/${itemId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${userToken}`,
